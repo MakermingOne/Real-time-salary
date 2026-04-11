@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+  <title>实时工资</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #000;
+      --bg-secondary: #1c1c1e;
+      --text-primary: #fff;
+      --text-secondary: #8e8e93;
+      --accent: #34c759;
+      --card-bg: rgba(255,255,255,0.1);
+      --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Noto Sans SC', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.5s ease;
+    }
+
+    .app-container {
+      display: flex;
+      height: 100vh;
+      gap: 0;
+    }
+
+    .settings-panel {
+      width: 400px;
+      min-width: 400px;
+      background: var(--bg-secondary);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .settings-panel h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--accent);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .radio-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .radio-option input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .radio-option label {
+      display: block;
+      padding: 12px 14px;
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .radio-option input:checked + label {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: var(--card-bg);
+    }
+
+    .theme-selector {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .theme-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .theme-btn.active {
+      border-color: var(--text-primary);
+    }
+
+    .theme-dark { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+    .theme-light { background: linear-gradient(135deg, #f5f7fa, #c3cfe2); }
+    .theme-gold { background: linear-gradient(135deg, #FFD700, #FFA500); }
+    .theme-green { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .theme-purple { background: linear-gradient(135deg, #667eea, #764ba2); }
+
+    .label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+      color: var(--bg-secondary);
+      font-size: 12px;
+      font-weight: bold;
+      cursor: help;
+      margin-left: 8px;
+      position: relative;
+    }
+
+    .help-tooltip {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 8px;
+      padding: 12px;
+      background: var(--bg-primary);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-primary);
+      width: 260px;
+      text-align: left;
+      z-index: 1000;
+      display: none;
+      line-height: 1.5;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .help-icon:hover .help-tooltip {
+      display: block;
+    }
+
+    .help-tooltip::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid rgba(255,255,255,0.2);
+    }
+
+    .help-tooltip h4 {
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .help-tooltip p {
+      margin-bottom: 6px;
+    }
+
+    .preview-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-panel .time-display {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .preview-panel .date-display {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 60px;
+    }
+
+    .preview-panel .coin-icon {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .preview-panel .amount-display {
+      font-size: 72px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .preview-panel .rate-display {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 50px;
+    }
+
+    .preview-panel .status-bar {
+      display: flex;
+      gap: 30px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .preview-panel .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preview-panel .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .fullscreen-mode .settings-panel {
+      display: none;
+    }
+
+    .fullscreen-mode .preview-panel {
+      width: 100vw;
+      min-width: 100vw;
+    }
+
+    .back-btn, .fullscreen-btn {
+      position: fixed;
+      width: 44px;
+      height: 44px;
+      background: var(--card-bg);
+      border: none;
+      border-radius: 50%;
+      color: var(--text-primary);
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .back-btn.active, .fullscreen-btn.active {
+      display: flex;
+    }
+
+    .back-btn { top: 20px; left: 20px; }
+    .fullscreen-btn { top: 20px; right: 20px; }
+
+    .screen-saver-hint {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    .falling-coin {
+      position: fixed;
+      width: 30px;
+      height: 30px;
+      pointer-events: none;
+      z-index: 1;
+      animation: fall-linear 8s linear infinite;
+      opacity: 0.3;
+    }
+
+    @keyframes fall-linear {
+      0% {
+        transform: translateY(-30px) rotate(0deg);
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+
+    .sound-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sound-toggle input[type="checkbox"] {
+      width: 50px;
+      height: 28px;
+      appearance: none;
+      background: var(--card-bg);
+      border-radius: 14px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .sound-toggle input[type="checkbox"]::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+
+    .sound-toggle input[type="checkbox"]:checked {
+      background: var(--accent);
+    }
+
+    .sound-toggle input[type="checkbox"]:checked::after {
+      transform: translateX(22px);
+    }
+
+    body.theme-gold {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+    }
+
+    body.theme-gold .coin-icon,
+    body.theme-gold .falling-coin {
+      filter: drop-shadow(0 0 10px #FFD700);
+    }
+
+    body.theme-light {
+      --bg-primary: #f5f7fa;
+      --bg-secondary: #fff;
+      --text-primary: #1a1a2e;
+      --text-secondary: #666;
+      --card-bg: rgba(0,0,0,0.05);
+    }
+
+    body.theme-green { background: #11998e; }
+    body.theme-purple { background: #667eea; }
+
+    @media (max-width: 900px) {
+      .app-container {
+        flex-direction: column;
+      }
+      .settings-panel {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        max-height: 50vh;
+      }
+      .preview-panel {
+        flex: 1;
+        padding: 20px;
+      }
+      .preview-panel .coin-icon {
+        width: 80px;
+        height: 80px;
+      }
+      .preview-panel .amount-display {
+        font-size: 48px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .settings-panel {
+        padding: 16px;
+      }
+      .preview-panel .coin-icon {
+        width: 60px;
+        height: 60px;
+      }
+      .preview-panel .amount-display {
+        font-size: 36px;
+      }
+      .preview-panel .time-display {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" id="appContainer">
+    <div class="settings-panel">
+      <h2>💰 实时工资</h2>
+      
+      <div class="form-group">
+        <label>月薪</label>
+        <div class="form-row">
+          <input type="number" id="monthlySalary" placeholder="请输入你的月薪" value="10000" style="flex: 2;">
+          <select id="currency" style="flex: 1;">
+            <option value="CNY">人民币 (¥)</option>
+            <option value="USD">美元 ($)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label-row">
+          <label>收入计算方式</label>
+          <div class="help-icon">?
+            <div class="help-tooltip">
+              <h4>计算说明</h4>
+              <p><strong>24小时计算收益：</strong>每天从0点开始，按每秒平均计算收入。全天24小时随时可以看到收入在增长。</p>
+              <p><strong>仅工作时间计算收益：</strong>按实际工作日和工时计算。收入只在您设置的工作时间内增长，午休时间不计算。月薪会除以当月实际工作日数（不含周末）。</p>
+            </div>
+          </div>
+        </div>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="calcMode" id="calc24h" value="24h" checked>
+            <label for="calc24h">24小时计算收益</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="calcMode" id="calcWork" value="work">
+            <label for="calcWork">仅工作时间计算收益</label>
+          </div>
+        </div>
+      </div>
+      
+      <div id="workTimeSettings" style="display: none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>上班时间</label>
+            <input type="time" id="workStartTime" value="09:30">
+          </div>
+          <div class="form-group">
+            <label>下班时间</label>
+            <input type="time" id="workEndTime" value="19:00">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>午休开始</label>
+            <input type="time" id="lunchStartTime" value="12:30">
+          </div>
+          <div class="form-group">
+            <label>午休结束</label>
+            <input type="time" id="lunchEndTime" value="14:00">
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>时区</label>
+        <select id="timezone">
+          <option value="8" selected>北京时区 (UTC+8)</option>
+          <option value="0">伦敦 (UTC+0)</option>
+          <option value="-5">纽约 (UTC-5)</option>
+          <option value="9">东京 (UTC+9)</option>
+          <option value="-8">洛杉矶 (UTC-8)</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>音效提醒</label>
+        <div class="sound-toggle">
+          <input type="checkbox" id="soundEnabled">
+          <span>启用金币音效</span>
+        </div>
+      </div>
+      
+      <div class="form-group" id="stepGroup" style="display: none;">
+        <label>触发金额步长</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="soundStep" id="step10" value="10" checked>
+            <label for="step10">¥10</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="soundStep" id="step50" value="50">
+            <label for="step50">¥50</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="soundStep" id="step100" value="100">
+            <label for="step100">¥100</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label-row">
+          <label>主题风格</label>
+        </div>
+        <div class="theme-selector">
+          <div class="theme-btn theme-dark active" data-theme="dark"></div>
+          <div class="theme-btn theme-light" data-theme="light"></div>
+          <div class="theme-btn theme-gold" data-theme="gold"></div>
+          <div class="theme-btn theme-green" data-theme="green"></div>
+          <div class="theme-btn theme-purple" data-theme="purple"></div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>背景特效</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="bgEffect" id="effectNone" value="none" checked>
+            <label for="effectNone">无</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="bgEffect" id="effectRain" value="rain">
+            <label for="effectRain">金币雨</label>
+          </div>
+        </div>
+      </div>
+      
+      <button class="btn" id="completeBtn">完成设置</button>
+      <button class="btn btn-secondary" id="screensaverBtn">进入屏保模式</button>
+    </div>
+    
+    <div class="preview-panel" id="previewPanel">
+      <div class="time-display" id="timeDisplay">09:00:00</div>
+      <div class="date-display" id="dateDisplay">2024年1月1日 星期一</div>
+      
+      <svg class="coin-icon" viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="coinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFD700"/>
+            <stop offset="50%" style="stop-color:#FFA500"/>
+            <stop offset="100%" style="stop-color:#FFD700"/>
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="45" fill="url(#coinGradient)" stroke="#DAA520" stroke-width="2"/>
+        <circle cx="50" cy="50" r="35" fill="none" stroke="#DAA520" stroke-width="1" stroke-dasharray="5,3"/>
+        <text x="50" y="58" text-anchor="middle" font-size="24" font-weight="bold" fill="#8B4513">¥</text>
+      </svg>
+      
+      <div class="amount-display" id="amountDisplay">¥0.00</div>
+      <div class="rate-display" id="rateDisplay">每秒收入 ¥0.0000</div>
+      
+      <div class="status-bar">
+        <div class="status-item">
+          <div class="status-dot"></div>
+          <span>实时计算中</span>
+        </div>
+        <div class="status-item" id="workStatus">已工作 0 小时 0 分</div>
+        <div class="status-item" id="calcModeDisplay">24小时计算</div>
+      </div>
+    </div>
+  </div>
+  
+  <button class="back-btn" id="backBtn">←</button>
+  <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
+  <div class="screen-saver-hint" id="screensaverHint">按 ESC 退出</div>
+
+  <script>
+    let settings = {
+      monthlySalary: 10000,
+      currency: 'CNY',
+      workStartTime: '09:30',
+      workEndTime: '19:00',
+      lunchStartTime: '12:30',
+      lunchEndTime: '14:00',
+      calcMode: '24h',
+      timezone: 8,
+      theme: 'dark',
+      bgEffect: 'none',
+      soundEnabled: false,
+      soundStep: 10
+    };
+
+    let updateInterval = null;
+    let isRunning = false;
+    let lastEarned = 0;
+    let audioContext = null;
+    let coinRainInterval = null;
+
+    const appContainer = document.getElementById('appContainer');
+    const previewPanel = document.getElementById('previewPanel');
+    const backBtn = document.getElementById('backBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const screensaverHint = document.getElementById('screensaverHint');
+    const soundEnabled = document.getElementById('soundEnabled');
+    const stepGroup = document.getElementById('stepGroup');
+    const workTimeSettings = document.getElementById('workTimeSettings');
+
+    soundEnabled.addEventListener('change', () => {
+      stepGroup.style.display = soundEnabled.checked ? 'block' : 'none';
+      settings.soundEnabled = soundEnabled.checked;
+    });
+
+    document.querySelectorAll('input[name="calcMode"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        workTimeSettings.style.display = radio.value === 'work' ? 'block' : 'none';
+        settings.calcMode = radio.value;
+        if (!isRunning) updateDisplay();
+      });
+    });
+
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        settings.theme = btn.dataset.theme;
+        applyTheme(settings.theme);
+      });
+    });
+
+    function applyTheme(theme) {
+      document.body.className = '';
+      if (theme !== 'dark') {
+        document.body.classList.add('theme-' + theme);
+      }
+    }
+
+    document.querySelectorAll('#appContainer input, #appContainer select').forEach(input => {
+      input.addEventListener('change', updateSettings);
+      input.addEventListener('input', updateSettings);
+    });
+
+    function getWorkingDaysInMonth(year, month) {
+      let workingDays = 0;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dayOfWeek = date.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          workingDays++;
+        }
+      }
+      return workingDays;
+    }
+
+    function updateSettings() {
+      settings.monthlySalary = parseFloat(document.getElementById('monthlySalary').value) || 10000;
+      settings.currency = document.getElementById('currency').value;
+      settings.workStartTime = document.getElementById('workStartTime').value || '09:30';
+      settings.workEndTime = document.getElementById('workEndTime').value || '19:00';
+      settings.lunchStartTime = document.getElementById('lunchStartTime').value || '12:30';
+      settings.lunchEndTime = document.getElementById('lunchEndTime').value || '14:00';
+      settings.calcMode = document.querySelector('input[name="calcMode"]:checked').value;
+      settings.timezone = parseInt(document.getElementById('timezone').value);
+      settings.bgEffect = document.querySelector('input[name="bgEffect"]:checked').value;
+      settings.soundEnabled = soundEnabled.checked;
+      settings.soundStep = parseInt(document.querySelector('input[name="soundStep"]:checked').value);
+      
+      workTimeSettings.style.display = settings.calcMode === 'work' ? 'block' : 'none';
+      
+      applyTheme(settings.theme);
+      if (!isRunning) {
+        updateDisplay();
+      }
+    }
+
+    document.getElementById('completeBtn').addEventListener('click', startFullscreen);
+    document.getElementById('screensaverBtn').addEventListener('click', startScreensaver);
+
+    backBtn.addEventListener('click', stopFullscreen);
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isRunning) {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+        stopFullscreen();
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    function playCoinSound() {
+      if (!settings.soundEnabled) return;
+      
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1760, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (e) {
+        console.log('Audio not supported');
+      }
+    }
+
+    function createFallingCoin() {
+      const coin = document.createElement('div');
+      coin.className = 'falling-coin';
+      coin.innerHTML = `<svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="#FFD700" stroke="#DAA520" stroke-width="2"/>
+        <circle cx="50" cy="50" r="35" fill="none" stroke="#DAA520" stroke-width="1"/>
+        <text x="50" y="58" text-anchor="middle" font-size="24" font-weight="bold" fill="#8B4513">¥</text>
+      </svg>`;
+      
+      coin.style.left = Math.random() * (window.innerWidth - 30) + 'px';
+      coin.style.top = '-30px';
+      coin.style.animationDuration = (6 + Math.random() * 4) + 's';
+      
+      document.body.appendChild(coin);
+      
+      setTimeout(() => {
+        coin.remove();
+      }, 10000);
+    }
+
+    function startCoinRain() {
+      if (coinRainInterval) return;
+      for (let i = 0; i < 15; i++) {
+        setTimeout(createFallingCoin, i * 400);
+      }
+      coinRainInterval = setInterval(createFallingCoin, 800);
+    }
+
+    function stopCoinRain() {
+      if (coinRainInterval) {
+        clearInterval(coinRainInterval);
+        coinRainInterval = null;
+      }
+      document.querySelectorAll('.falling-coin').forEach(coin => coin.remove());
+    }
+
+    function startFullscreen() {
+      appContainer.classList.add('fullscreen-mode');
+      backBtn.classList.add('active');
+      fullscreenBtn.classList.add('active');
+      
+      if (settings.bgEffect === 'rain') {
+        startCoinRain();
+      }
+      
+      startDisplay(false);
+    }
+
+    function startScreensaver() {
+      appContainer.classList.add('fullscreen-mode');
+      backBtn.classList.add('active');
+      fullscreenBtn.classList.add('active');
+      
+      document.documentElement.requestFullscreen().catch(() => {});
+      screensaverHint.style.display = 'block';
+      
+      if (settings.bgEffect === 'rain') {
+        startCoinRain();
+      }
+      
+      setTimeout(() => {
+        screensaverHint.style.opacity = '0';
+        screensaverHint.style.transition = 'opacity 1s';
+      }, 3000);
+      
+      startDisplay(true);
+    }
+
+    function startDisplay(screensaverMode = false) {
+      updateSettings();
+      
+      isRunning = true;
+      lastEarned = 0;
+      updateDisplay();
+      updateInterval = setInterval(updateDisplay, 1000);
+    }
+
+    function stopFullscreen() {
+      isRunning = false;
+      clearInterval(updateInterval);
+      
+      stopCoinRain();
+      
+      appContainer.classList.remove('fullscreen-mode');
+      backBtn.classList.remove('active');
+      fullscreenBtn.classList.remove('active');
+      screensaverHint.style.display = 'none';
+      screensaverHint.style.opacity = '1';
+      
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
+
+    function updateDisplay() {
+      const now = new Date();
+      const timezoneOffset = settings.timezone * 60 * 60 * 1000;
+      const localOffset = now.getTimezoneOffset() * 60 * 1000;
+      const adjustedTime = new Date(now.getTime() + localOffset + timezoneOffset);
+      
+      const hours = adjustedTime.getHours().toString().padStart(2, '0');
+      const minutes = adjustedTime.getMinutes().toString().padStart(2, '0');
+      const seconds = adjustedTime.getSeconds().toString().padStart(2, '0');
+      document.getElementById('timeDisplay').textContent = `${hours}:${minutes}:${seconds}`;
+      
+      const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+      const year = adjustedTime.getFullYear();
+      const month = adjustedTime.getMonth();
+      const date = adjustedTime.getDate();
+      const weekday = weekdays[adjustedTime.getDay()];
+      document.getElementById('dateDisplay').textContent = `${year}年${month + 1}月${date}日 ${weekday}`;
+      
+      const workingDays = getWorkingDaysInMonth(year, month);
+      const dailySalary = settings.monthlySalary / workingDays;
+      
+      const currencySymbol = settings.currency === 'CNY' ? '¥' : '$';
+      const currencyPrefix = settings.currency === 'CNY' ? '¥' : '$';
+      
+      let secondsWorked = 0;
+      let shouldCalculate = false;
+      
+      if (settings.calcMode === '24h') {
+        secondsWorked = adjustedTime.getHours() * 3600 + adjustedTime.getMinutes() * 60 + adjustedTime.getSeconds();
+        shouldCalculate = true;
+      } else {
+        const dayOfWeek = adjustedTime.getDay();
+        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+        
+        if (!isWeekend) {
+          const [startH, startM] = settings.workStartTime.split(':').map(Number);
+          const [endH, endM] = settings.workEndTime.split(':').map(Number);
+          const [lunchStartH, lunchStartM] = settings.lunchStartTime.split(':').map(Number);
+          const [lunchEndH, lunchEndM] = settings.lunchEndTime.split(':').map(Number);
+          
+          const workStartSeconds = startH * 3600 + startM * 60;
+          const workEndSeconds = endH * 3600 + endM * 60;
+          const lunchStartSeconds = lunchStartH * 3600 + lunchStartM * 60;
+          const lunchEndSeconds = lunchEndH * 3600 + lunchEndM * 60;
+          const currentSeconds = adjustedTime.getHours() * 3600 + adjustedTime.getMinutes() * 60 + adjustedTime.getSeconds();
+          
+          const lunchDuration = lunchEndSeconds - lunchStartSeconds;
+          
+          if (currentSeconds >= workStartSeconds && currentSeconds <= workEndSeconds) {
+            if (currentSeconds <= lunchStartSeconds) {
+              secondsWorked = currentSeconds - workStartSeconds;
+            } else if (currentSeconds >= lunchEndSeconds) {
+              secondsWorked = currentSeconds - workStartSeconds - lunchDuration;
+            } else {
+              secondsWorked = lunchStartSeconds - workStartSeconds;
+            }
+            shouldCalculate = true;
+          } else if (currentSeconds > workEndSeconds) {
+            secondsWorked = workEndSeconds - workStartSeconds - lunchDuration;
+            shouldCalculate = true;
+          }
+        }
+      }
+      
+      const secondsInDay = 24 * 3600;
+      
+      let actualWorkSeconds = 9 * 3600;
+      if (settings.calcMode === 'work') {
+        const [startH, startM] = settings.workStartTime.split(':').map(Number);
+        const [endH, endM] = settings.workEndTime.split(':').map(Number);
+        const [lunchStartH, lunchStartM] = settings.lunchStartTime.split(':').map(Number);
+        const [lunchEndH, lunchEndM] = settings.lunchEndTime.split(':').map(Number);
+        
+        const workDuration = (endH * 60 + endM) - (startH * 60 + startM);
+        const lunchDuration = (lunchEndH * 60 + lunchEndM) - (lunchStartH * 60 + lunchStartM);
+        actualWorkSeconds = (Math.max(0, workDuration - lunchDuration)) * 60;
+      }
+      
+      const perSecond = settings.calcMode === '24h' ? dailySalary / secondsInDay : dailySalary / actualWorkSeconds;
+      
+      let earned = 0;
+      if (shouldCalculate) {
+        earned = perSecond * secondsWorked;
+      }
+      
+      document.getElementById('amountDisplay').textContent = `${currencyPrefix}${earned.toFixed(2)}`;
+      document.getElementById('rateDisplay').textContent = `每秒收入 ${currencyPrefix}${perSecond.toFixed(4)}`;
+      
+      document.querySelector('.coin-icon text').textContent = currencySymbol;
+      
+      if (settings.soundEnabled && isRunning) {
+        const stepValue = settings.currency === 'CNY' ? settings.soundStep : settings.soundStep * 7;
+        const currentStep = Math.floor(earned / stepValue);
+        const lastStep = Math.floor(lastEarned / stepValue);
+        
+        if (currentStep > lastStep) {
+          playCoinSound();
+          createFallingCoin();
+        }
+      }
+      lastEarned = earned;
+      
+      const hoursWorked = Math.floor(secondsWorked / 3600);
+      const minsWorked = Math.floor((secondsWorked % 3600) / 60);
+      document.getElementById('workStatus').textContent = `已工作 ${hoursWorked} 小时 ${minsWorked} 分`;
+      document.getElementById('calcModeDisplay').textContent = settings.calcMode === '24h' ? '24小时计算' : '工作时间计算';
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    updateSettings();
+  </script>
+</body>
+</html>

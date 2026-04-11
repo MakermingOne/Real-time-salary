@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="#000" rx="24"/>
+  <circle cx="96" cy="96" r="70" fill="url(#coinGrad)" stroke="#DAA520" stroke-width="4"/>
+  <circle cx="96" cy="96" r="55" fill="none" stroke="#DAA520" stroke-width="2" stroke-dasharray="8,5"/>
+  <text x="96" y="110" text-anchor="middle" font-size="48" font-weight="bold" fill="#8B4513">¥</text>
+  <defs>
+    <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#FFA500"/>
+      <stop offset="100%" style="stop-color:#FFD700"/>
+    </linearGradient>
+  </defs>
+</svg>
