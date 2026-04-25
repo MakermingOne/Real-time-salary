@@ -384,6 +384,109 @@
     .sound-toggle input[type="checkbox"]:checked { background: var(--accent); }
     .sound-toggle input[type="checkbox"]:checked::after { transform: translateX(22px); }
 
+    .footer-section {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .developer-info {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .support-btn {
+      width: 100%;
+    }
+
+    .support-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+    }
+
+    .support-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      cursor: pointer;
+    }
+
+    .modal-content {
+      position: relative;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .modal-content h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .modal-content > p:nth-of-type(1) {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .qrcode-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .qrcode-container img {
+      width: 100%;
+      max-width: 260px;
+    }
+
     @media (max-width: 900px) {
       .app-container { flex-direction: column; }
       .settings-panel { width: 100%; height: auto; max-height: 50vh; }
@@ -571,6 +674,13 @@
       
       <button class="btn" id="completeBtn">完成设置</button>
       <button class="btn btn-secondary" id="screensaverBtn">进入屏保</button>
+      
+      <div class="footer-section">
+        <div class="developer-info">
+          <p>开发者：小小铭Makerming</p>
+        </div>
+        <button class="btn btn-secondary support-btn" id="supportBtn">❤️ 喜欢请支持一下</button>
+      </div>
     </div>
     
     <div class="preview-panel" id="previewPanel">
@@ -633,6 +743,22 @@
   <button class="back-btn" id="backBtn">←</button>
   <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
   <div class="screen-saver-hint" id="screensaverHint">按 ESC 退出</div>
+
+  <!-- Support Modal -->
+  <div class="support-modal" id="supportModal">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">×</button>
+      <h3>支持开发者</h3>
+      <p>感谢你的支持！</p>
+      <div class="qrcode-container">
+        <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;">扫码支持</p>
+        <!-- 收款码图片将显示在这里 -->
+        <img id="qrcodeImage" src="qrcode.png" alt="收款码" style="max-width: 280px; border-radius: 8px;">
+      </div>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-top: 16px;">您的支持是我继续开发的动力 💪</p>
+    </div>
+  </div>
 
   <script>
     let settings = {
@@ -766,6 +892,19 @@
     document.getElementById('fullscreenBtn').addEventListener('click', () => {
       if (!document.fullscreenElement) document.documentElement.requestFullscreen();
       else document.exitFullscreen();
+    });
+
+    // Support Button Event Listeners
+    document.getElementById('supportBtn').addEventListener('click', () => {
+      document.getElementById('supportModal').classList.add('active');
+    });
+
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('supportModal').classList.remove('active');
+    });
+
+    document.getElementById('modalBackdrop').addEventListener('click', () => {
+      document.getElementById('supportModal').classList.remove('active');
     });
 
     document.addEventListener('keydown', (e) => {
