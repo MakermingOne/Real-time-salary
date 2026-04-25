@@ -9,8 +9,6 @@
   <title>实时工资</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -139,18 +137,11 @@
       justify-content: center;
       font-size: 20px;
       transition: transform 0.2s;
-      background: var(--card-bg);
+      background: #222;
     }
 
     .effect-btn:hover { transform: scale(1.05); }
     .effect-btn.active { border-color: var(--accent); }
-
-    .effect-none { background: #222; color: #666; }
-    .effect-rain { background: linear-gradient(135deg, #1a1a2e, #16213e); }
-    .effect-sparkle { background: linear-gradient(135deg, #2d1b4e, #1a0a2e); }
-    .effect-flow { background: linear-gradient(135deg, #0f2027, #203a43); }
-    .effect-swirl { background: linear-gradient(135deg, #1e3c72, #2a5298); }
-    .effect-fire { background: linear-gradient(135deg, #200122, #6f0000); }
 
     .label-row { display: flex; align-items: center; justify-content: space-between; }
 
@@ -294,44 +285,16 @@
       opacity: 0.6;
     }
 
-    .falling-coin {
+    .falling-item {
       position: fixed;
-      width: 30px;
-      height: 30px;
       pointer-events: none;
       z-index: 1;
+      animation: fall 8s linear infinite;
     }
 
-    .effect-rain .falling-coin { animation: fall-rain 8s linear infinite; opacity: 0.3; }
-    .effect-sparkle .falling-coin { animation: fall-sparkle 4s ease-out infinite; }
-    .effect-flow .falling-coin { animation: fall-flow 6s linear infinite; opacity: 0.4; }
-    .effect-swirl .falling-coin { animation: fall-swirl 5s linear infinite; }
-    .effect-fire .falling-coin { animation: fall-fire 3s ease-out infinite; }
-
-    @keyframes fall-rain {
-      0% { transform: translateY(-30px) rotate(0deg); }
-      100% { transform: translateY(100vh) rotate(360deg); }
-    }
-    @keyframes fall-sparkle {
-      0% { transform: translateY(-30px) scale(0); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translateY(50vh) scale(1); opacity: 0; }
-    }
-    @keyframes fall-flow {
-      0% { transform: translateY(-30px) translateX(0); opacity: 0; }
-      10% { opacity: 0.6; }
-      90% { opacity: 0.6; }
-      100% { transform: translateY(100vh) translateX(50px); opacity: 0; }
-    }
-    @keyframes fall-swirl {
-      0% { transform: translateY(-30px) rotate(0deg) scale(0.5); opacity: 0; }
-      50% { opacity: 0.8; }
-      100% { transform: translateY(100vh) rotate(720deg) scale(1); opacity: 0; }
-    }
-    @keyframes fall-fire {
-      0% { transform: translateY(-30px) scale(0.3); opacity: 0; }
-      50% { opacity: 1; filter: blur(0); }
-      100% { transform: translateY(30vh) scale(1.5); opacity: 0; filter: blur(4px); }
+    @keyframes fall {
+      0% { transform: translateY(-40px) rotate(0deg); opacity: 0.6; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0.3; }
     }
 
     .sound-toggle {
@@ -364,12 +327,6 @@
 
     .sound-toggle input[type="checkbox"]:checked { background: var(--accent); }
     .sound-toggle input[type="checkbox"]:checked::after { transform: translateX(22px); }
-
-    body.effect-rain { background: linear-gradient(135deg, #1a1a2e, #16213e); }
-    body.effect-sparkle { background: linear-gradient(135deg, #2d1b4e, #1a0a2e); }
-    body.effect-flow { background: linear-gradient(135deg, #0f2027, #203a43); }
-    body.effect-swirl { background: linear-gradient(135deg, #1e3c72, #2a5298); }
-    body.effect-fire { background: linear-gradient(135deg, #200122, #6f0000); }
 
     @media (max-width: 900px) {
       .app-container { flex-direction: column; }
@@ -462,12 +419,12 @@
       <div class="form-group">
         <label>背景特效</label>
         <div class="effect-selector">
-          <div class="effect-btn effect-none" data-effect="none" title="无">✕</div>
-          <div class="effect-btn effect-rain active" data-effect="rain" title="金币雨">💰</div>
-          <div class="effect-btn effect-sparkle" data-effect="sparkle" title="星光">✨</div>
-          <div class="effect-btn effect-flow" data-effect="flow" title="流水">🌊</div>
-          <div class="effect-btn effect-swirl" data-effect="swirl" title="旋涡">🌀</div>
-          <div class="effect-btn effect-fire" data-effect="fire" title="火焰">🔥</div>
+          <div class="effect-btn active" data-effect="none" title="无特效">✕</div>
+          <div class="effect-btn" data-effect="cny-rain" title="金币雨">¥</div>
+          <div class="effect-btn" data-effect="usd-rain" title="美元雨">$</div>
+          <div class="effect-btn" data-effect="sparkle" title="星光">✨</div>
+          <div class="effect-btn" data-effect="glow" title="光芒">🌟</div>
+          <div class="effect-btn" data-effect="bubble" title="气泡">🔮</div>
         </div>
       </div>
       
@@ -476,6 +433,28 @@
         <div class="sound-toggle">
           <input type="checkbox" id="soundEnabled" checked>
           <span>启用音效</span>
+        </div>
+      </div>
+      
+      <div class="form-group" id="stepGroup">
+        <label>触发金额</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="soundStep" id="step10" value="10" checked>
+            <label for="step10">¥10</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="soundStep" id="step50" value="50">
+            <label for="step50">¥50</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="soundStep" id="step100" value="100">
+            <label for="step100">¥100</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="soundStep" id="step1000" value="1000">
+            <label for="step1000">¥1000</label>
+          </div>
         </div>
       </div>
       
@@ -528,7 +507,7 @@
       lunchEndTime: '14:00',
       calcMode: '24h',
       timezone: 8,
-      bgEffect: 'rain',
+      bgEffect: 'none',
       soundEnabled: true,
       soundStep: 10
     };
@@ -540,8 +519,16 @@
     let effectInterval = null;
 
     const appContainer = document.getElementById('appContainer');
-    const soundEnabled = document.getElementById('soundEnabled');
+    const soundEnabledEl = document.getElementById('soundEnabled');
     const workTimeSettings = document.getElementById('workTimeSettings');
+
+    const effectItems = {
+      'cny-rain': '¥',
+      'usd-rain': '$',
+      'sparkle': '✨',
+      'glow': '🌟',
+      'bubble': '🔮'
+    };
 
     document.querySelectorAll('input[name="calcMode"]').forEach(radio => {
       radio.addEventListener('change', () => {
@@ -551,8 +538,14 @@
       });
     });
 
-    soundEnabled.addEventListener('change', () => {
-      settings.soundEnabled = soundEnabled.checked;
+    soundEnabledEl.addEventListener('change', () => {
+      settings.soundEnabled = soundEnabledEl.checked;
+    });
+
+    document.querySelectorAll('input[name="soundStep"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        settings.soundStep = parseInt(radio.value);
+      });
     });
 
     document.querySelectorAll('.effect-btn').forEach(btn => {
@@ -560,32 +553,17 @@
         document.querySelectorAll('.effect-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         settings.bgEffect = btn.dataset.effect;
-        applyEffect(settings.bgEffect);
-        if (!isRunning) updateDisplay();
+        if (!isRunning) {
+          stopEffect();
+          if (settings.bgEffect !== 'none') startEffect();
+        }
       });
     });
-
-    function applyEffect(effect) {
-      document.body.className = '';
-      if (effect !== 'none') {
-        document.body.classList.add('effect-' + effect);
-      }
-    }
 
     document.querySelectorAll('#appContainer input, #appContainer select').forEach(input => {
       input.addEventListener('change', updateSettings);
       input.addEventListener('input', updateSettings);
     });
-
-    function getWorkingDaysInMonth(year, month) {
-      let workingDays = 0;
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        if (date.getDay() !== 0 && date.getDay() !== 6) workingDays++;
-      }
-      return workingDays;
-    }
 
     function updateSettings() {
       settings.monthlySalary = parseFloat(document.getElementById('monthlySalary').value) || 10000;
@@ -633,30 +611,30 @@
       } catch(e) {}
     }
 
-    function createFallingCoin() {
-      const coin = document.createElement('div');
-      coin.className = 'falling-coin';
-      coin.innerHTML = `<svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="45" fill="#FFD700" stroke="#DAA520" stroke-width="2"/>
-        <circle cx="50" cy="50" r="35" fill="none" stroke="#DAA520" stroke-width="1"/>
-        <text x="50" y="58" text-anchor="middle" font-size="24" font-weight="bold" fill="#8B4513">¥</text>
-      </svg>`;
-      coin.style.left = Math.random() * (window.innerWidth - 30) + 'px';
-      coin.style.top = '-30px';
-      coin.style.animationDuration = (4 + Math.random() * 4) + 's';
-      document.body.appendChild(coin);
-      setTimeout(() => coin.remove(), 10000);
+    function createFallingItem() {
+      const item = document.createElement('div');
+      item.className = 'falling-item';
+      const char = effectItems[settings.bgEffect] || '¥';
+      item.textContent = char;
+      item.style.left = Math.random() * (window.innerWidth - 30) + 'px';
+      item.style.top = '-40px';
+      item.style.fontSize = (20 + Math.random() * 20) + 'px';
+      item.style.color = settings.bgEffect === 'cny-rain' ? '#FFD700' : 
+                    settings.bgEffect === 'usd-rain' ? '#90EE90' : '#FFF';
+      item.style.animationDuration = (6 + Math.random() * 4) + 's';
+      document.body.appendChild(item);
+      setTimeout(() => item.remove(), 12000);
     }
 
     function startEffect() {
       if (effectInterval || settings.bgEffect === 'none') return;
-      for (let i = 0; i < 15; i++) setTimeout(createFallingCoin, i * 400);
-      effectInterval = setInterval(createFallingCoin, 800);
+      for (let i = 0; i < 10; i++) setTimeout(createFallingItem, i * 500);
+      effectInterval = setInterval(createFallingItem, 1000);
     }
 
     function stopEffect() {
       if (effectInterval) { clearInterval(effectInterval); effectInterval = null; }
-      document.querySelectorAll('.falling-coin').forEach(c => c.remove());
+      document.querySelectorAll('.falling-item').forEach(c => c.remove());
     }
 
     function startFullscreen() {
@@ -750,7 +728,7 @@
         const stepVal = settings.currency === 'CNY' ? settings.soundStep : settings.soundStep * 7;
         if (Math.floor(earned / stepVal) > Math.floor(lastEarned / stepVal)) {
           playCoinSound();
-          createFallingCoin();
+          createFallingItem();
         }
       }
       lastEarned = earned;
@@ -760,7 +738,6 @@
       document.getElementById('calcModeDisplay').textContent = settings.calcMode === '24h' ? '24小时' : '工作时间';
     }
 
-    applyEffect(settings.bgEffect);
     updateSettings();
     
     if ('serviceWorker' in navigator) {
