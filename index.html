@@ -417,10 +417,29 @@
       </div>
       
       <div class="form-group">
-        <label>背景特效</label>
+        <div class="label-row" style="margin-bottom: 8px;">
+          <label>背景特效</label>
+          <div class="sound-toggle" style="margin-bottom: 0;">
+            <input type="checkbox" id="effectEnabled" checked>
+            <span>启用背景特效</span>
+          </div>
+        </div>
         <div class="effect-selector">
-          <div class="effect-btn active" data-effect="none" title="无特效">✕</div>
-          <div class="effect-btn" data-effect="cny-rain" title="金币雨">¥</div>
+          <div class="effect-btn active" data-effect="coin-svg" title="金币雨">
+            <svg width="28" height="28" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="coinGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#FFD700"/>
+                  <stop offset="50%" style="stop-color:#FFA500"/>
+                  <stop offset="100%" style="stop-color:#FFD700"/>
+                </linearGradient>
+              </defs>
+              <circle cx="50" cy="50" r="45" fill="url(#coinGradient2)" stroke="#DAA520" stroke-width="2"/>
+              <circle cx="50" cy="50" r="35" fill="none" stroke="#DAA520" stroke-width="1" stroke-dasharray="5,3"/>
+              <text x="50" y="60" text-anchor="middle" font-size="32" font-weight="bold" fill="#8B4513">¥</text>
+            </svg>
+          </div>
+          <div class="effect-btn" data-effect="cny-rain" title="金币符号雨">¥</div>
           <div class="effect-btn" data-effect="usd-rain" title="美元雨">$</div>
           <div class="effect-btn" data-effect="sparkle" title="星光">✨</div>
           <div class="effect-btn" data-effect="glow" title="光芒">🌟</div>
@@ -507,7 +526,8 @@
       lunchEndTime: '14:00',
       calcMode: '24h',
       timezone: 8,
-      bgEffect: 'none',
+      bgEffect: 'coin-svg', // 默认金币图案
+      effectEnabled: true, // 新增背景特效开关
       soundEnabled: true,
       soundStep: 10
     };
@@ -521,8 +541,10 @@
     const appContainer = document.getElementById('appContainer');
     const soundEnabledEl = document.getElementById('soundEnabled');
     const workTimeSettings = document.getElementById('workTimeSettings');
+    const effectEnabledEl = document.getElementById('effectEnabled');
 
     const effectItems = {
+      'coin-svg': 'svg',
       'cny-rain': '¥',
       'usd-rain': '$',
       'sparkle': '✨',
@@ -553,11 +575,28 @@
         document.querySelectorAll('.effect-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         settings.bgEffect = btn.dataset.effect;
+        if (!settings.effectEnabled) return;
         if (!isRunning) {
           stopEffect();
-          if (settings.bgEffect !== 'none') startEffect();
+          startEffect();
         }
       });
+    });
+
+    // 背景特效开关逻辑
+    effectEnabledEl.addEventListener('change', () => {
+      settings.effectEnabled = effectEnabledEl.checked;
+      if (!settings.effectEnabled) {
+        stopEffect();
+        settings.bgEffect = 'none';
+      } else {
+        // 恢复为金币雨
+        settings.bgEffect = document.querySelector('.effect-btn.active')?.dataset.effect || 'cny-rain';
+        if (!isRunning) {
+          stopEffect();
+          startEffect();
+        }
+      }
     });
 
     document.querySelectorAll('#appContainer input, #appContainer select').forEach(input => {
@@ -614,20 +653,39 @@
     function createFallingItem() {
       const item = document.createElement('div');
       item.className = 'falling-item';
-      const char = effectItems[settings.bgEffect] || '¥';
-      item.textContent = char;
+      if (settings.bgEffect === 'coin-svg') {
+        item.innerHTML = `<svg width="36" height="36" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="coinGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#FFD700"/>
+              <stop offset="50%" style="stop-color:#FFA500"/>
+              <stop offset="100%" style="stop-color:#FFD700"/>
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="50" r="45" fill="url(#coinGradient3)" stroke="#DAA520" stroke-width="2"/>
+          <circle cx="50" cy="50" r="35" fill="none" stroke="#DAA520" stroke-width="1" stroke-dasharray="5,3"/>
+          <text x="50" y="60" text-anchor="middle" font-size="32" font-weight="bold" fill="#8B4513">¥</text>
+        </svg>`;
+      } else {
+        const char = effectItems[settings.bgEffect] || '¥';
+        item.textContent = char;
+      }
       item.style.left = Math.random() * (window.innerWidth - 30) + 'px';
       item.style.top = '-40px';
       item.style.fontSize = (20 + Math.random() * 20) + 'px';
-      item.style.color = settings.bgEffect === 'cny-rain' ? '#FFD700' : 
-                    settings.bgEffect === 'usd-rain' ? '#90EE90' : '#FFF';
+      // 金币符号和美元符号都用金色
+      if (settings.bgEffect === 'cny-rain' || settings.bgEffect === 'usd-rain' || settings.bgEffect === 'coin-svg') {
+        item.style.color = '#FFD700';
+      } else {
+        item.style.color = '#FFF';
+      }
       item.style.animationDuration = (6 + Math.random() * 4) + 's';
       document.body.appendChild(item);
       setTimeout(() => item.remove(), 12000);
     }
 
     function startEffect() {
-      if (effectInterval || settings.bgEffect === 'none') return;
+      if (!settings.effectEnabled || effectInterval || settings.bgEffect === 'none') return;
       for (let i = 0; i < 10; i++) setTimeout(createFallingItem, i * 500);
       effectInterval = setInterval(createFallingItem, 1000);
     }
