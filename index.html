@@ -297,6 +297,62 @@
       100% { transform: translateY(100vh) rotate(360deg); opacity: 0.3; }
     }
 
+    .salary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .salary-item {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .salary-label {
+      color: var(--text-secondary);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .salary-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      max-width: 300px;
+      padding: 0 20px;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.1s linear;
+      border-radius: 3px;
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      text-align: center;
+    }
+
     .sound-toggle {
       display: flex;
       align-items: center;
@@ -403,18 +459,58 @@
             <input type="time" id="lunchEndTime" value="14:00">
           </div>
         </div>
+        <div class="form-group">
+          <label>工作日</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" name="workDays" id="workDaysDoubleRest" value="double" checked>
+              <label for="workDaysDoubleRest">双休</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" name="workDays" id="workDaysSingleRest" value="single">
+              <label for="workDaysSingleRest">单休</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" name="workDays" id="workDaysCustom" value="custom">
+              <label for="workDaysCustom">自定义</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" id="customWorkDays" style="display: none;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 40px;">
+              <input type="checkbox" id="day0" value="0" checked>
+              <label for="day0" style="display: inline; font-size: 12px; margin-left: 4px;">日</label>
+            </div>
+            <div style="flex: 1; min-width: 40px;">
+              <input type="checkbox" id="day1" value="1" checked>
+              <label for="day1" style="display: inline; font-size: 12px; margin-left: 4px;">一</label>
+            </div>
+            <div style="flex: 1; min-width: 40px;">
+              <input type="checkbox" id="day2" value="2" checked>
+              <label for="day2" style="display: inline; font-size: 12px; margin-left: 4px;">二</label>
+            </div>
+            <div style="flex: 1; min-width: 40px;">
+              <input type="checkbox" id="day3" value="3" checked>
+              <label for="day3" style="display: inline; font-size: 12px; margin-left: 4px;">三</label>
+            </div>
+            <div style="flex: 1; min-width: 40px;">
+              <input type="checkbox" id="day4" value="4" checked>
+              <label for="day4" style="display: inline; font-size: 12px; margin-left: 4px;">四</label>
+            </div>
+            <div style="flex: 1; min-width: 40px;">
+              <input type="checkbox" id="day5" value="5" checked>
+              <label for="day5" style="display: inline; font-size: 12px; margin-left: 4px;">五</label>
+            </div>
+            <div style="flex: 1; min-width: 40px;">
+              <input type="checkbox" id="day6" value="6" checked>
+              <label for="day6" style="display: inline; font-size: 12px; margin-left: 4px;">六</label>
+            </div>
+          </div>
+        </div>
       </div>
       
-      <div class="form-group">
-        <label>时区</label>
-        <select id="timezone">
-          <option value="8" selected>北京 (UTC+8)</option>
-          <option value="0">伦敦 (UTC+0)</option>
-          <option value="-5">纽约 (UTC-5)</option>
-          <option value="9">东京 (UTC+9)</option>
-          <option value="-8">洛杉矶 (UTC-8)</option>
-        </select>
-      </div>
+
       
       <div class="form-group">
         <div class="label-row" style="margin-bottom: 8px;">
@@ -470,10 +566,6 @@
             <input type="radio" name="soundStep" id="step100" value="100">
             <label for="step100">¥100</label>
           </div>
-          <div class="radio-option">
-            <input type="radio" name="soundStep" id="step1000" value="1000">
-            <label for="step1000">¥1000</label>
-          </div>
         </div>
       </div>
       
@@ -501,6 +593,32 @@
       <div class="amount-display" id="amountDisplay">¥0.00</div>
       <div class="rate-display" id="rateDisplay">每秒收入 ¥0.0000</div>
       
+      <div id="salaryGrid" class="salary-grid" style="display: none;">
+        <div class="salary-item">
+          <div class="salary-label">秒薪</div>
+          <div class="salary-value" id="secondSalary">¥0.00</div>
+        </div>
+        <div class="salary-item">
+          <div class="salary-label">时薪</div>
+          <div class="salary-value" id="hourSalary">¥0.00</div>
+        </div>
+        <div class="salary-item">
+          <div class="salary-label">日薪</div>
+          <div class="salary-value" id="daySalary">¥0.00</div>
+        </div>
+        <div class="salary-item">
+          <div class="salary-label">月薪</div>
+          <div class="salary-value" id="monthSalary">¥0.00</div>
+        </div>
+      </div>
+
+      <div id="progressContainer" class="progress-bar-container" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">已工作 0 小时 0 分</div>
+      </div>
+      
       <div class="status-bar">
         <div class="status-item">
           <div class="status-dot"></div>
@@ -525,9 +643,10 @@
       lunchStartTime: '12:30',
       lunchEndTime: '14:00',
       calcMode: '24h',
-      timezone: 8,
-      bgEffect: 'coin-svg', // 默认金币图案
-      effectEnabled: true, // 新增背景特效开关
+      workDays: 'double', // 工作日选择：double(双休), single(单休), custom(自定义)
+      customWorkDays: [1,2,3,4,5], // 自定义工作日 0-6 对应周日-周六
+      bgEffect: 'coin-svg',
+      effectEnabled: true,
       soundEnabled: true,
       soundStep: 10
     };
@@ -559,6 +678,29 @@
         if (!isRunning) updateDisplay();
       });
     });
+
+    // 工作日选择事件监听
+    document.querySelectorAll('input[name="workDays"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        settings.workDays = radio.value;
+        const customDiv = document.getElementById('customWorkDays');
+        customDiv.style.display = radio.value === 'custom' ? 'block' : 'none';
+      });
+    });
+
+    // 自定义工作日选择
+    for (let i = 0; i < 7; i++) {
+      const checkbox = document.getElementById(`day${i}`);
+      if (checkbox) {
+        checkbox.addEventListener('change', () => {
+          settings.customWorkDays = [];
+          for (let j = 0; j < 7; j++) {
+            const cb = document.getElementById(`day${j}`);
+            if (cb && cb.checked) settings.customWorkDays.push(j);
+          }
+        });
+      }
+    }
 
     soundEnabledEl.addEventListener('change', () => {
       settings.soundEnabled = soundEnabledEl.checked;
@@ -612,7 +754,7 @@
       settings.lunchStartTime = document.getElementById('lunchStartTime').value || '12:30';
       settings.lunchEndTime = document.getElementById('lunchEndTime').value || '14:00';
       settings.calcMode = document.querySelector('input[name="calcMode"]:checked').value;
-      settings.timezone = parseInt(document.getElementById('timezone').value);
+      settings.workDays = document.querySelector('input[name="workDays"]:checked').value;
       
       workTimeSettings.style.display = settings.calcMode === 'work' ? 'block' : 'none';
       if (!isRunning) updateDisplay();
@@ -686,8 +828,8 @@
 
     function startEffect() {
       if (!settings.effectEnabled || effectInterval || settings.bgEffect === 'none') return;
-      for (let i = 0; i < 10; i++) setTimeout(createFallingItem, i * 500);
-      effectInterval = setInterval(createFallingItem, 1000);
+      for (let i = 0; i < 20; i++) setTimeout(createFallingItem, i * 200);
+      effectInterval = setInterval(createFallingItem, 500);
     }
 
     function stopEffect() {
@@ -719,6 +861,13 @@
       updateSettings();
       isRunning = true;
       lastEarned = 0;
+      
+      // 在全屏模式下显示多档位工资和进度条
+      if (appContainer.classList.contains('fullscreen-mode')) {
+        document.getElementById('salaryGrid').style.display = 'grid';
+        document.getElementById('progressContainer').style.display = 'block';
+      }
+      
       updateDisplay();
       updateInterval = setInterval(updateDisplay, 1000);
     }
@@ -731,14 +880,14 @@
       document.getElementById('backBtn').classList.remove('active');
       document.getElementById('fullscreenBtn').classList.remove('active');
       document.getElementById('screensaverHint').style.display = 'none';
+      document.getElementById('salaryGrid').style.display = 'none';
+      document.getElementById('progressContainer').style.display = 'none';
       if (document.fullscreenElement) document.exitFullscreen();
     }
 
     function updateDisplay() {
       const now = new Date();
-      const tz = settings.timezone * 3600000;
-      const local = now.getTimezoneOffset() * 60000;
-      const t = new Date(now.getTime() + local + tz);
+      const t = now;
       
       document.getElementById('timeDisplay').textContent = 
         `${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}:${t.getSeconds().toString().padStart(2,'0')}`;
@@ -757,7 +906,17 @@
         secondsWorked = t.getHours() * 3600 + t.getMinutes() * 60 + t.getSeconds();
         shouldCalc = true;
       } else {
-        if (t.getDay() !== 0 && t.getDay() !== 6) {
+        // 判断工作日
+        let isWorkDay = false;
+        if (settings.workDays === 'double') {
+          isWorkDay = t.getDay() !== 0 && t.getDay() !== 6;
+        } else if (settings.workDays === 'single') {
+          isWorkDay = t.getDay() !== 0;
+        } else {
+          isWorkDay = settings.customWorkDays.includes(t.getDay());
+        }
+        
+        if (isWorkDay) {
           const [sh, sm] = settings.workStartTime.split(':').map(Number);
           const [eh, em] = settings.workEndTime.split(':').map(Number);
           const [ls, le] = [settings.lunchStartTime, settings.lunchEndTime].map(v => v.split(':').map(Number));
@@ -775,12 +934,34 @@
         }
       }
       
-      const perSec = settings.calcMode === '24h' ? dailySalary / 86400 : dailySalary / ((9*3600 - 90*60));
+      const perSec = settings.calcMode === '24h' ? dailySalary / 86400 : dailySalary / (9 * 3600 - 90 * 60);
       const earned = shouldCalc ? perSec * secondsWorked : 0;
       
       document.getElementById('amountDisplay').textContent = `${symbol}${earned.toFixed(2)}`;
       document.getElementById('rateDisplay').textContent = `每秒 ${symbol}${perSec.toFixed(4)}`;
       document.querySelector('.coin-icon text').textContent = symbol;
+      
+      // 多档位工资显示（仅在全屏模式）
+      if (isRunning) {
+        document.getElementById('secondSalary').textContent = `${symbol}${perSec.toFixed(4)}`;
+        document.getElementById('hourSalary').textContent = `${symbol}${(perSec * 3600).toFixed(2)}`;
+        document.getElementById('daySalary').textContent = `${symbol}${dailySalary.toFixed(2)}`;
+        document.getElementById('monthSalary').textContent = `${symbol}${settings.monthlySalary.toFixed(2)}`;
+        
+        // 计算工作进度
+        let progressPercent = 0;
+        if (settings.calcMode === 'work') {
+          const [sh, sm] = settings.workStartTime.split(':').map(Number);
+          const [eh, em] = settings.workEndTime.split(':').map(Number);
+          const [ls, le] = [settings.lunchStartTime, settings.lunchEndTime].map(v => v.split(':').map(Number));
+          const totalWorkSeconds = (eh * 3600 + em * 60) - (sh * 3600 + sm * 60) - ((le[0] * 3600 + le[1] * 60) - (ls[0] * 3600 + ls[1] * 60));
+          progressPercent = Math.min(100, (secondsWorked / totalWorkSeconds) * 100);
+        } else {
+          progressPercent = ((t.getHours() * 3600 + t.getMinutes() * 60 + t.getSeconds()) / 86400) * 100;
+        }
+        document.getElementById('progressFill').style.width = progressPercent + '%';
+        document.getElementById('progressLabel').textContent = `已工作 ${Math.floor(secondsWorked/3600)}小时 ${Math.floor((secondsWorked%3600)/60)}分`;
+      }
       
       if (settings.soundEnabled && isRunning) {
         const stepVal = settings.currency === 'CNY' ? settings.soundStep : settings.soundStep * 7;
@@ -797,6 +978,10 @@
     }
 
     updateSettings();
+    // 初始化时启动背景特效
+    if (settings.effectEnabled && settings.bgEffect !== 'none') {
+      startEffect();
+    }
     
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
