@@ -275,16 +275,6 @@
     .back-btn { top: 20px; left: 20px; }
     .fullscreen-btn { top: 20px; right: 20px; }
 
-    .screen-saver-hint {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 14px;
-      color: var(--text-secondary);
-      opacity: 0.6;
-    }
-
     .falling-item {
       position: fixed;
       pointer-events: none;
@@ -660,10 +650,12 @@
       </div>
       
       <div class="form-group">
-        <label>金币音效</label>
-        <div class="sound-toggle">
-          <input type="checkbox" id="soundEnabled" checked>
-          <span>启用音效</span>
+        <div class="label-row" style="margin-bottom: 8px;">
+          <label>金币音效</label>
+          <div class="sound-toggle" style="margin-bottom: 0;">
+            <input type="checkbox" id="soundEnabled" checked>
+            <span>启用音效</span>
+          </div>
         </div>
       </div>
       
@@ -755,7 +747,6 @@
   
   <button class="back-btn" id="backBtn">←</button>
   <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
-  <div class="screen-saver-hint" id="screensaverHint">按 ESC 退出</div>
 
   <!-- Support Modal -->
   <div class="support-modal" id="supportModal">
@@ -983,10 +974,12 @@
       setTimeout(() => item.remove(), 12000);
     }
 
-    function startEffect() {
+    function startEffect(intense = false) {
       if (!settings.effectEnabled || effectInterval || settings.bgEffect === 'none') return;
-      for (let i = 0; i < 20; i++) setTimeout(createFallingItem, i * 200);
-      effectInterval = setInterval(createFallingItem, 500);
+      const count = intense ? 20 : 3;
+      const interval = intense ? 500 : 1500;
+      for (let i = 0; i < count; i++) setTimeout(createFallingItem, i * 200);
+      effectInterval = setInterval(createFallingItem, interval);
     }
 
     function stopEffect() {
@@ -998,7 +991,7 @@
       appContainer.classList.add('fullscreen-mode');
       document.getElementById('backBtn').classList.add('active');
       document.getElementById('fullscreenBtn').classList.add('active');
-      if (settings.bgEffect !== 'none') startEffect();
+      if (settings.bgEffect !== 'none') startEffect(true);
       startDisplay();
     }
 
@@ -1007,10 +1000,7 @@
       document.getElementById('backBtn').classList.add('active');
       document.getElementById('fullscreenBtn').classList.add('active');
       document.documentElement.requestFullscreen().catch(() => {});
-      const hint = document.getElementById('screensaverHint');
-      hint.style.display = 'block';
-      setTimeout(() => hint.style.opacity = '0', 3000);
-      if (settings.bgEffect !== 'none') startEffect();
+      if (settings.bgEffect !== 'none') startEffect(true);
       startDisplay();
     }
 
@@ -1036,7 +1026,6 @@
       appContainer.classList.remove('fullscreen-mode');
       document.getElementById('backBtn').classList.remove('active');
       document.getElementById('fullscreenBtn').classList.remove('active');
-      document.getElementById('screensaverHint').style.display = 'none';
       document.getElementById('salaryGrid').style.display = 'none';
       document.getElementById('progressContainer').style.display = 'none';
       if (document.fullscreenElement) document.exitFullscreen();
