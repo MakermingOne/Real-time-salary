@@ -1,0 +1,24 @@
+{
+  "name": "real-time-salary",
+  "version": "1.0.0",
+  "description": "Real-time salary tracker application",
+  "main": "sw.js",
+  "scripts": {
+    "dev": "npx http-server -p 3000",
+    "test": "echo \"No tests specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MakermingOne/Real-time-salary.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MakermingOne/Real-time-salary/issues"
+  },
+  "homepage": "https://github.com/MakermingOne/Real-time-salary#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
